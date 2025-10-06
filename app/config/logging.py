@@ -1,7 +1,6 @@
 import logging
 from app.config.settings import Config
 
-
 def setup_logging(app):
     """Configura logging para Flask"""
     
