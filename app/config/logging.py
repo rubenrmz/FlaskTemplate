@@ -12,9 +12,6 @@ def setup_logging(app):
     
     if Config.FLASK_ENV == 'production':
         # Solo archivo
-        if not os.path.exists('logs'):
-            os.makedirs('logs')
-        
         file_handler = logging.FileHandler('logs/app.log')
         file_handler.setLevel(log_level)
         file_handler.setFormatter(formatter)

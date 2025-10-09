@@ -1,27 +1,28 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # === BINDING ===
-# Regularmente no debe ser expuesta directamente, si no a traves de NGINX
-bind = "127.0.0.1:5000" # Indica el port
+bind = f"127.0.0.1:{os.getenv('FLASK_PORT') or '5000'}"
 
 # === WORKERS ===
-# Para el manejo de paralelismo o concurrencia (define segun las necesidades de la app y evitar bottlenecks)
-workers = 4
-worker_class = "gevent"  # Manejo de SSE
-worker_connections = 100  # Suficiente para 3 usuarios
+workers = int(os.getenv("GUNICORN_WORKERS") or "2")
+worker_connections = int(os.getenv("GUNICORN_WORKER_MAX_CONNECTIONS") or "100")
+worker_class = os.getenv("GUNICORN_WORKER_CLASS") or "gevent"
 
-# === TIMEOUTS PARA 6,000 CONSULTAS ===
-# 6000 consultas × 1 seg = 6000 seg = 100 min = 1h 40min
-timeout = 30000  # 2.3 horas (con margen de seguridad)
-graceful_timeout = 30000
-keepalive = 300
+# === TIMEOUTS ===
+timeout = int(os.getenv("GUNICORN_TIMEOUT") or "3000")
+graceful_timeout = int(os.getenv("GUNICORN_GRACEFUL_TIMEOUT") or "3000")
+keepalive = int(os.getenv("GUNICORN_KEEP_ALIVE") or "60")
 
 # === LOGS ===
+logs_dir = os.path.join(BASE_DIR, "logs")
+os.makedirs(logs_dir, exist_ok=True)
 accesslog = os.path.join(BASE_DIR, "logs", "access.log")
 errorlog = os.path.join(BASE_DIR, "logs", "error.log")
-loglevel = os.getenv("LOG_LEVEL", "INFO")
+loglevel = os.getenv("LOG_LEVEL") or "ERROR"
 
 # === PID ===
 pidfile = os.path.join(BASE_DIR, "gunicorn.pid")
@@ -31,7 +32,7 @@ proc_name = "flask_app-production"
 
 # === PERFORMANCE ===
 preload_app = True
-reload = False # NO permite cambios en tiempo de ejecución
+reload = False
 
 # === WORKER RESTART ===
 max_requests = 1000
