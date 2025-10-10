@@ -34,8 +34,7 @@ Una breve descripción de lo que hace tu proyecto, a quién va dirigido y cuál 
 
 * **Característica 1:** Descripción de la característica.
 * **Característica 2:** Descripción de la característica.
-* **API REST:** Endpoints bien definidos para...
-* **Integración con:** Menciona si se integra con otros servicios.
+* **API REST:** Endpoints bien definidos para....
 
 ---
 
@@ -43,10 +42,10 @@ Una breve descripción de lo que hace tu proyecto, a quién va dirigido y cuál 
 
 * **Backend:** [Python](https://www.python.org/), [Flask](https://flask.palletsprojects.com/)
 * **Servidor WSGI:** [Gunicorn](https://gunicorn.org/)
-* **Proxy Inverso:** [Nginx](https://www.nginx.com/) (Opcional)
-* **Base de Datos:** [MySQL](https://www.mysql.com/) (Opcional)
-* **Caché/Cola de Tareas:** [Redis](https://redis.io/) (Opcional)
+* **Base de Datos:** [MySQL](https://www.mysql.com/)
 * **Manejo de Dependencias:** [Pip](https://pip.pypa.io/en/stable/)
+* **Proxy Inverso:** [Nginx](https://www.nginx.com/)
+* **Caché/Cola de Tareas:** [Redis](https://redis.io/) (Opcional)
 
 ---
 
@@ -68,19 +67,14 @@ Sigue estos pasos para tener una copia del proyecto funcionando localmente.
 
 1.  **Clona el repositorio:**
     ```sh
-    git clone [https://github.com/](https://github.com/)[tu-usuario]/[nombre-del-proyecto].git
+    git clone -b [rama] [https://github.com/](https://github.com/)[nombre-del-proyecto].git
     cd [nombre-del-proyecto]
     ```
 
 2.  **Crea y activa un entorno virtual:**
     ```sh
-    # Para Unix/macOS
     python3 -m venv venv
     source venv/bin/activate
-
-    # Para Windows
-    python -m venv venv
-    venv\Scripts\activate
     ```
 
 3.  **Instala las dependencias:**
@@ -131,52 +125,7 @@ Una vez que el servidor está en marcha, puedes interactuar con la aplicación.
 * Accede a la interfaz web en `http://localhost:5000`.
 * Puedes probar los endpoints de la API usando herramientas como Postman o `curl`:
     ```sh
-    curl [http://127.0.0.1:5000/api/endpoint-de-ejemplo](http://127.0.0.1:5000/api/endpoint-de-ejemplo)
+    curl [http://127.0.0.1:5000/api/v1/endpoint-de-ejemplo](http://127.0.0.1:5000/api/v1/endpoint-de-ejemplo)
     ```
 
 ---
-
-## ☁️ Despliegue en Producción
-
-Para desplegar la aplicación en un servidor de producción, se recomienda usar Gunicorn como servidor WSGI y Nginx como proxy inverso.
-
-### Usando Gunicorn
-
-Gunicorn es un servidor WSGI robusto para Python. Para ejecutar tu aplicación con Gunicorn, utiliza el siguiente comando. Se recomienda crear un archivo `wsgi.py` en la raíz del proyecto que contenga la instancia de la aplicación.
-
-```python
-# wsgi.py
-from app import create_app
-
-app = create_app()
-```
-
-## Creando un Servicio con Systemd
-
-Para asegurar que Gunicorn se inicie automáticamente y se reinicie en caso de fallo, puedes crear un archivo de servicio de systemd.
-
-Crea el archivo /etc/systemd/system/[nombre-del-proyecto].service:
-
-```bash
-[Unit]
-Description=Gunicorn service for Flask App
-After=network.target
-
-[Service]
-User=<debian>
-Group=<debian>
-WorkingDirectory=<pwd>
-
-ExecStart=<pwd/start.sh>
-
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-```=multi-user.target
-```
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.

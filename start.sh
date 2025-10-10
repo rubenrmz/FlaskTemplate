@@ -3,14 +3,14 @@ set -e
 
 # Verificar que venv existe
 if [ ! -d "venv" ]; then
-    echo "Error: El entorno virtual 'venv' no existe"
+    echo "Error: Requiere 'venv'"
     exit 1
 fi
 
 # Activar venv
 source venv/bin/activate
 
-# Verificar si necesita instalar dependencias
+# Verificar instalacion de dependencias
 if [ -f "requirements.txt" ] && [ ! -f "venv/.dependencies_installed" ]; then
     echo "Error: Requiere instalar dependencias"
     exit 1

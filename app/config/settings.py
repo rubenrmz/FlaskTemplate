@@ -24,9 +24,8 @@ class Config:
     LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     
     # Configuración CORS
-    CORS_ORIGINS = []
-    CORS_METHODS = ["GET", "OPTIONS"]  # Solo GET + OPTIONS para preflight
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS') or 'http://localhost:5000'
+    CORS_METHODS = ["GET", "OPTIONS"]
     CORS_ALLOW_HEADERS = ["Content-Type"]
-    CORS_EXPOSE_HEADERS = []
     CORS_SUPPORTS_CREDENTIALS = False
-    CORS_MAX_AGE = 3600
+    CORS_MAX_AGE = int(os.getenv('CORS_MAX_AGE') or '3600')
