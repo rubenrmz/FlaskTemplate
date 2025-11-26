@@ -1,5 +1,5 @@
 # app/config/logging.py
-import os, logging
+import logging
 from app.config.settings import Config
 
 def setup_logging(app):

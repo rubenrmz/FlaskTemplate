@@ -4,7 +4,6 @@ from flask import Blueprint, jsonify
 from app.config.settings import Config
 from app.config.logging import get_logger
 from app.config.extensions import db
-from sqlalchemy import text
 
 logger = get_logger(__name__)
 

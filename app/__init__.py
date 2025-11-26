@@ -1,7 +1,7 @@
 from flask import Flask
 from app.config.settings import Config
 from app.config.logging import setup_logging
-from app.api.routes.routes import api_bp
+from app.api.routes.app_routes import api_bp
 from app.config.extensions import db, ma, cors, limiter
 from app.config.cors import get_cors_config
 from app.config.security import apply_security_headers
@@ -25,8 +25,8 @@ def create_app():
     setup_logging(app)
     
     # Inicializar base de datos
-    db.init_app(app)
-    ma.init_app(app)
+    # db.init_app(app)
+    # ma.init_app(app)
     
     # Registrar blueprints
     app.register_blueprint(api_bp, url_prefix='/api/v1')

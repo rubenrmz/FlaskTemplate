@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# run.py
 import os
 from dotenv import load_dotenv
 

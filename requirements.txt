@@ -1,11 +1,20 @@
 # Incluye los modulos que requiere la app:Flask>=3.1.1
+
+# === DEPENDENCIAS CORE ===
 Flask>=3.1.2, <4
+python-dotenv>=1.1.1, <2
 gunicorn>=23.0.0, <24
-gevent>=25.9.1, <26
+flask-cors>=6.0.1, <7
+Flask-Limiter>=4.0.0, <5
+
+# === DEPENDENCIAS DB ===
 PyMySQL>=1.1.2, <2
 Flask-SQLAlchemy>=3.1.1, <4
 flask-marshmallow>=1.3.0, <2
 marshmallow-sqlalchemy>=1.4.2, <2
-python-dotenv>=1.1.1, <2
-Flask-Limiter>=4.0.0, <5
-flask-cors>=6.0.1, <7
+
+# === CONCURRENCIA ===
+# gevent>=25.9.1, <26
+
+# === PARA NAVEGADOR BACKGROUND ===
+# playwright==1.55.0

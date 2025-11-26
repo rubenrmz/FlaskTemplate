@@ -24,8 +24,8 @@ accesslog = os.path.join(BASE_DIR, "logs", "access.log")
 errorlog = os.path.join(BASE_DIR, "logs", "error.log")
 loglevel = os.getenv("LOG_LEVEL") or "ERROR"
 
-# === PID ===
-pidfile = os.path.join(BASE_DIR, "gunicorn.pid")
+# === DAEMON MODE ===
+daemon = False  # CRÍTICO para Type=simple
 
 # === NOMBRE DEL PROCESO ===
 proc_name = "flask_app-production"
