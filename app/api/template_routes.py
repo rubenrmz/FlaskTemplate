@@ -1,11 +1,9 @@
 # app/api/routes/routes.py
-import time
+import time, logging
 from flask import Blueprint, jsonify
-from app.config.settings import Config
-from app.config.logging import get_logger
-from app.config.extensions import db
+from app.config import db
 
-logger = get_logger(__name__)
+logger = logging(__name__)
 
 api_bp = Blueprint('api', __name__)
 

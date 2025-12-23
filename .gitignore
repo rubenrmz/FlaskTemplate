@@ -1,24 +1,34 @@
 # .gitignore
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+
+# Virtual environments
 env/
 venv/
 ENV/
 .venv
-*.pid
 
 # Flask
 instance/
 .webassets-cache
+
+# Secrets (CRÍTICO)
 .env
+.env.*
+*.pem
+*.key
+secrets/
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
+migrations/versions/  # opcional, algunos lo versionan
 
 # IDE
 .vscode/
@@ -32,6 +42,7 @@ instance/
 htmlcov/
 .pytest_cache/
 .tox/
+coverage.xml
 
 # OS
 .DS_Store
@@ -40,9 +51,17 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# Temp/Uploads
 tmp/
+uploads/
+static/uploads/
 
 # Distribution
 dist/
 build/
 *.egg-info/
+
+# Gunicorn
+*.pid
+*.sock

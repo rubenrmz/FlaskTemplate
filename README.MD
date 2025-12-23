@@ -3,8 +3,6 @@
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![Flask](https://img.shields.io/badge/flask-2.x-lightgrey.svg)
 ![Gunicorn](https://img.shields.io/badge/gunicorn-20.x-green.svg)
-![Nginx](https://img.shields.io/badge/nginx-stable-brightgreen.svg)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 Una breve descripción de lo que hace tu proyecto, a quién va dirigido y cuál es su propósito principal. Mantenlo conciso pero informativo.
 
@@ -44,7 +42,6 @@ Una breve descripción de lo que hace tu proyecto, a quién va dirigido y cuál 
 * **Servidor WSGI:** [Gunicorn](https://gunicorn.org/)
 * **Base de Datos:** [MySQL](https://www.mysql.com/)
 * **Manejo de Dependencias:** [Pip](https://pip.pypa.io/en/stable/)
-* **Proxy Inverso:** [Nginx](https://www.nginx.com/)
 * **Caché/Cola de Tareas:** [Redis](https://redis.io/) (Opcional)
 
 ---
@@ -53,7 +50,7 @@ Una breve descripción de lo que hace tu proyecto, a quién va dirigido y cuál 
 
 Antes de comenzar, asegúrate de tener instalado lo siguiente en tu sistema:
 
-* Python 3.12 o superior
+* Python 3.12
 * Pip y Virtualenv
 * Git
 
