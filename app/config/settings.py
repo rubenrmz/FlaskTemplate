@@ -27,6 +27,20 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # ===========================================
+    # SMTP / EMAIL
+    # ===========================================
+    MAIL_SERVER = os.getenv('MAIL_SERVER', 'localhost')
+    MAIL_PORT = int(os.getenv('MAIL_PORT', 1025))
+    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'False').lower() == 'true'
+    MAIL_USE_SSL = os.getenv('MAIL_USE_SSL', 'False').lower() == 'true'
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME') or None
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD') or None
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@tuapp.com')
+    MAIL_TIMEOUT = int(os.getenv('MAIL_TIMEOUT') or 0) or None
+    MAIL_MAX_EMAILS = int(os.getenv('MAIL_MAX_EMAILS') or 0) or None
+    MAIL_ASCII_ATTACHMENTS = os.getenv('MAIL_ASCII_ATTACHMENTS', 'False').lower() == 'true'
+
+    # ===========================================
     # EXTERNAL SERVICES
     # ===========================================
     EXTERNAL_API_URL_BASE = os.getenv('EXTERNAL_API_URL_BASE', '')
