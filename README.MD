@@ -99,19 +99,17 @@ Sigue estos pasos para tener una copia del proyecto funcionando localmente.
     REDIS_URL="redis://localhost:6379/0"
     ```
 
-5.  **Inicializa y migra la base de datos (si aplica):**
-    Si usas Flask-Migrate, ejecuta los siguientes comandos:
+5.  **Ejecuta el servidor de desarrollo:**
     ```sh
-    flask db init  # Solo la primera vez
-    flask db migrate -m "Migración inicial"
-    flask db upgrade
+    python run.py
     ```
+    La aplicación estará disponible en todas las interfaces `http://0.0.0.0:<port>`.
 
-6.  **Ejecuta el servidor de desarrollo:**
+6.  **Ejecuta el servidor de producción:**
     ```sh
-    flask run
+    gunicorn --config gunicorn.conf.py "src:create_app()"
     ```
-    La aplicación estará disponible en `http://127.0.0.1:5000`.
+    La aplicación estará disponible en `http://127.0.0.1:<port>`.
 
 ---
 
@@ -119,7 +117,7 @@ Sigue estos pasos para tener una copia del proyecto funcionando localmente.
 
 Una vez que el servidor está en marcha, puedes interactuar con la aplicación.
 
-* Accede a la interfaz web en `http://localhost:5000`.
+* Accede a la interfaz web (dependiendo del entorno) `http://interfaz(ces):<port>`.
 * Puedes probar los endpoints de la API usando herramientas como Postman o `curl`:
     ```sh
     curl [http://127.0.0.1:5000/api/v1/endpoint-de-ejemplo](http://127.0.0.1:5000/api/v1/endpoint-de-ejemplo)

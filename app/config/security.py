@@ -1,5 +1,5 @@
 # app/config/security.py
-from app.config.settings import Config
+from app.config import Config
 
 def apply_security_headers(app):
     is_production = Config.FLASK_ENV == 'production'

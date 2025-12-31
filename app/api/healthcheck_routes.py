@@ -5,9 +5,9 @@ from app.config import db
 
 logger = logging(__name__)
 
-api_bp = Blueprint('api', __name__)
+health_bp = Blueprint('health', __name__)
 
-@api_bp.route('/health', methods=['GET'])
+@health_bp.route('/health', methods=['GET'])
 def health_check():
     """
     Endpoint para verificar el estado del servicio
@@ -19,7 +19,7 @@ def health_check():
         'version': '1.0'
     }), 200
 
-@api_bp.route('/health/db', methods=['GET'])
+@health_bp.route('/health/db', methods=['GET'])
 def database_health_detailed():
     """Healthcheck detallado con info del pool"""
     
@@ -38,5 +38,7 @@ def database_health_detailed():
         return jsonify({
             'success': False, 
             'error': 'Ha ocurrido un error.'
-        }), 400
+        }), 503
+    finally:
+        db.session.remove()
     
