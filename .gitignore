@@ -19,7 +19,6 @@ instance/
 
 # Secrets (CRÍTICO)
 .env
-.env.*
 *.pem
 *.key
 secrets/

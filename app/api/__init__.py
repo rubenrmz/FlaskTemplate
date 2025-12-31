@@ -6,7 +6,7 @@ Este módulo centraliza el registro de todos los sub-blueprints,
 permitiendo un único punto de registro en la aplicación Flask.
 
 Uso en app.py:
-    from src.api import api_bp
+    from app.api import api_bp
     app.register_blueprint(api_bp, url_prefix='/api/v1')
 """
 

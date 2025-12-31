@@ -2,7 +2,7 @@
 import logging
 from functools import wraps
 from flask import request, jsonify
-from src.config import Config
+from app.config import Config
 
 logger = logging.getLogger(__name__)
 

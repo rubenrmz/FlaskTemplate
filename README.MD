@@ -107,7 +107,7 @@ Sigue estos pasos para tener una copia del proyecto funcionando localmente.
 
 6.  **Ejecuta el servidor de producción:**
     ```sh
-    gunicorn --config gunicorn.conf.py "src:create_app()"
+    gunicorn --config gunicorn.conf.py "app:create_app()"
     ```
     La aplicación estará disponible en `http://127.0.0.1:<port>`.
 

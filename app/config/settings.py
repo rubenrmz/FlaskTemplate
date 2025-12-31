@@ -1,4 +1,4 @@
-# app/config/settings.py
+# src/config/settings.py
 import os
 
 class Config:
@@ -6,10 +6,7 @@ class Config:
     # FLASK
     # ===========================================
     FLASK_ENV = os.getenv('FLASK_ENV', 'development')
-    DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     ADMIN_SECRET_KEY = os.getenv('ADMIN_SECRET_KEY', 'dev-secret-key-change-in-production')
-    APP_NAME = os.getenv('APP_NAME', 'flask_app')
     MA_ENABLED = os.getenv('MA_ENABLED', 'False').lower() in ['true', '1', 'yes']
 
     # ===========================================
@@ -92,12 +89,20 @@ class Config:
     RATE_LIMIT_LOGIN = os.getenv('RATE_LIMIT_LOGIN', '5 per minute')
 
     # ===========================================
+    # JWT
+    # ===========================================
+    JWT_ENABLED = os.getenv('JWT_ENABLED', 'False').lower() in ['true', '1', 'yes']
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+    JWT_ACCESS_TOKEN_EXPIRES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES') or 3600)
+    JWT_REFRESH_TOKEN_EXPIRES = int(os.getenv('JWT_REFRESH_TOKEN_EXPIRES') or 2592000)
+
+    # ===========================================
     # VALIDATION
     # ===========================================
     @staticmethod
     def validate():
         if Config.FLASK_ENV == 'production':
-            if Config.SECRET_KEY == 'dev-secret-key-change-in-production':
-                raise ValueError("SECRET_KEY debe configurarse en producción")
+            if Config.JWT_ENABLED and not Config.JWT_SECRET_KEY:
+                raise ValueError("JWT_SECRET_KEY debe configurarse en producción")
             if Config.CORS_ORIGINS in ['*', 'http://localhost:3000']:
                 raise ValueError("CORS_ORIGINS debe configurarse en producción")

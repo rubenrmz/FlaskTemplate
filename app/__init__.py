@@ -51,7 +51,4 @@ def create_app(config_class=Config):
     # Blueprints
     app.register_blueprint(api_bp, url_prefix='/api/v1')
 
-    # Middleware
-    app.wsgi_app = RequireOriginMiddleware(app.wsgi_app)
-
     return app

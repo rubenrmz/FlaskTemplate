@@ -1,9 +1,8 @@
 # app/config/extensions.py
-# src/config/extensions.py
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from src.config import Config
+from app.config import Config
 
 # Core (siempre requeridos)
 cors = CORS()
@@ -21,7 +20,7 @@ redis_client = None
 
 def init_redis():
     global redis_client
-    from app.config.settings import Config
+    from app.config import Config
     
     try:
         import redis as redis_lib
