@@ -1,5 +1,5 @@
-# app/config/cors.py
-from app.config import Config
+# src/config/cors.py
+from src.config import Config
 
 def get_cors_config():
     return {

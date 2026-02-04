@@ -1,8 +1,7 @@
-# app/__init__.py
+# src/__init__.py
 from flask import Flask
-from app.config import Config, cors, limiter, apply_security_headers, setup_logging, get_cors_config
-from app.api import api_bp
-from app.middleware.origin_validation import RequireOriginMiddleware
+from src.config import Config, cors, limiter, apply_security_headers, setup_logging, get_cors_config
+from src.api import api_bp
 
 def create_app(config_class=Config):
     """
@@ -18,28 +17,28 @@ def create_app(config_class=Config):
 
     # Database (opcional)
     if config_class.DB_ENABLED:
-        from app.config.extensions import db
+        from src.config.extensions import db
         if db is None:
             raise ImportError("Flask-SQLAlchemy no está instalado. Instálalo o desactiva DB_ENABLED.")
         db.init_app(app)
 
     # Marshmallow (opcional)
     if config_class.MA_ENABLED:
-        from app.config.extensions import ma
+        from src.config.extensions import ma
         if ma is None:
             raise ImportError("Flask-Marshmallow no está instalado. Instálalo o desactiva MA_ENABLED.")
         ma.init_app(app)
 
     # Mail (opcional)
     if config_class.MAIL_ENABLED:
-        from app.config.extensions import mail
+        from src.config.extensions import mail
         if mail is None:
             raise ImportError("Flask-Mailman no está instalado. Instálalo o desactiva MAIL_ENABLED.")
         mail.init_app(app)
 
     # Redis (opcional)
     if config_class.REDIS_ENABLED:
-        from app.config.extensions import init_redis
+        from src.config.extensions import init_redis
         redis_client = init_redis()
         if redis_client is None:
             raise ImportError("Redis no está disponible. Verifica la conexión o desactiva REDIS_ENABLED.")

@@ -1,11 +1,11 @@
-# app/api/__init__.py
+# src/api/__init__.py
 """
 Punto de entrada principal para todos los blueprints de la API.
 
 Este módulo centraliza el registro de todos los sub-blueprints,
 permitiendo un único punto de registro en la aplicación Flask.
 
-Uso en app.py:
+Uso en src/__init__.py:
     from app.api import api_bp
     app.register_blueprint(api_bp, url_prefix='/api/v1')
 """

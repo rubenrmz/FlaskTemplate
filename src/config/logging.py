@@ -1,13 +1,12 @@
-# app/config/logging.py
-import os
-import logging
-from app.config import Config
+# src/config/logging.py
+import os, logging
+from src.config.settings import Config
 
 
 def setup_logging(app):
     """Configura logging para Flask"""
     log_level = getattr(logging, Config.LOG_LEVEL.upper(), logging.INFO)
-    formatter = logging.Formatter(Config.LOG_FORMAT)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     
     root_logger = logging.getLogger()
     root_logger.setLevel(log_level)

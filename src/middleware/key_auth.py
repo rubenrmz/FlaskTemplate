@@ -1,12 +1,12 @@
-# app/middleware/admin_auth.py
+# src/middleware/key_auth.py
 import logging
 from functools import wraps
 from flask import request, jsonify
-from app.config import Config
+from src.config import Config
 
 logger = logging.getLogger(__name__)
 
-def require_admin(f):
+def require_admin_key(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         api_key = request.headers.get('X-Admin-Key')
