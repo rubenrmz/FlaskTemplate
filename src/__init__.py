@@ -44,6 +44,21 @@ def create_app(config_class=Config):
         if init_redis() is None:
             raise RuntimeError("Redis no disponible. Verifica la conexión o desactiva REDIS_ENABLED.")
 
+    # Sockets (opcional)
+    if config_class.WS_ENABLED:
+        from src.config.extensions import socketio
+        from src.api.socket_events import register_socket_events
+        socketio.init_app(
+            app,
+            message_queue=config_class.get_redis_uri(),
+            cors_allowed_origins="*",
+            async_mode="gevent",
+            logger=False,
+            engineio_logger=False,
+        )
+        register_socket_events(socketio)
+        logger.info("WebSockets inicializados")
+    
     # Seguridad y logging
     apply_security_headers(app)
     setup_logging(app)
