@@ -24,10 +24,10 @@ workers = int(os.getenv("GUNICORN_WORKERS", "3"))
 # - sync: requests simples, CPU-bound (1 request a la vez por worker)
 # - gthread: I/O moderado (usar con threads)
 # - gevent: alta concurrencia, WebSockets, SSE
-worker_class = os.getenv("GUNICORN_WORKER_CLASS", "sync")
+worker_class = os.getenv("GUNICORN_WORKER_CLASS", "gthread")
 
 # Threads por worker (solo aplica para gthread)
-threads = int(os.getenv("GUNICORN_THREADS", "2"))
+threads = int(os.getenv("GUNICORN_THREADS", "4"))
 
 # Conexiones máximas por worker (solo aplica para gevent)
 worker_connections = int(os.getenv("GUNICORN_WORKER_MAX_CONNECTIONS", "1000"))
@@ -71,8 +71,8 @@ daemon = os.getenv("GUNICORN_DAEMON", "False").lower() in ["true", "1", "yes"]
 # ===========================================
 # PERFORMANCE
 # ===========================================
-# Carga la app antes de hacer fork de workers
-# Reduce memoria compartida, pero requiere reinicio completo para cambios
+# preload_app=True con gevent requiere wsgi.py con monkey.patch_all() primero
+# Ver: wsgi.py en la raíz del proyecto
 preload_app = True
 reload = False
 

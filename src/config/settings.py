@@ -1,26 +1,28 @@
 # src/config/settings.py
 import os
 
+
 class Config:
     # ===========================================
     # FLASK
     # ===========================================
-    FLASK_ENV = os.getenv('FLASK_ENV', 'development')
-    ADMIN_SECRET_KEY = os.getenv('ADMIN_SECRET_KEY', 'dev-secret-key-change-in-production')
-    MA_ENABLED = os.getenv('MA_ENABLED', 'False').lower() in ['true', '1', 'yes']
+    FLASK_ENV         = os.getenv('FLASK_ENV', 'development')
+    ADMIN_SECRET_KEY  = os.getenv('ADMIN_SECRET_KEY', 'dev-secret-key-change-in-production')
+    MA_ENABLED        = os.getenv('MA_ENABLED', 'False').lower() in ['true', '1', 'yes']
+    APP_TIMEZONE = os.getenv('APP_TIMEZONE', 'America/Mexico_City')
 
     # ===========================================
     # DATABASE (opcional)
     # ===========================================
-    DB_ENABLED = os.getenv('DB_ENABLED', 'False').lower() in ['true', '1', 'yes']
-    DB_USER = os.getenv('DB_USER', 'root')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
-    DB_HOST = os.getenv('DB_HOST', 'localhost')
-    DB_PORT = os.getenv('DB_PORT', '3306')
+    DB_ENABLED  = os.getenv('DB_ENABLED', 'False').lower() in ['true', '1', 'yes']
+    DB_TYPE     = os.getenv('DB_TYPE', 'mysql')          # mysql | postgresql
+    DB_HOST     = os.getenv('DB_HOST', 'localhost')
+    DB_PORT     = os.getenv('DB_PORT', '3306')
     DB_DATABASE = os.getenv('DB_DATABASE', 'test')
-    DB_TYPE = os.getenv('DB_TYPE', 'mysql')
+    DB_USER     = os.getenv('DB_USER', 'root')
+    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
 
-    # Construir URI solo si está habilitado
+    # URI para SQLAlchemy (Modo B) — ignorado si usas PyMySQL directo (Modo A)
     if DB_ENABLED:
         _driver = 'postgresql+psycopg2' if DB_TYPE == 'postgresql' else 'mysql+pymysql'
         SQLALCHEMY_DATABASE_URI = f'{_driver}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DATABASE}'
@@ -32,33 +34,39 @@ class Config:
     # ===========================================
     # SMTP / EMAIL (opcional)
     # ===========================================
-    MAIL_ENABLED = os.getenv('MAIL_ENABLED', 'False').lower() in ['true', '1', 'yes']
-    MAIL_SERVER = os.getenv('MAIL_SERVER', 'localhost')
-    MAIL_PORT = int(os.getenv('MAIL_PORT') or 1025)
-    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'False').lower() == 'true'
-    MAIL_USE_SSL = os.getenv('MAIL_USE_SSL', 'False').lower() == 'true'
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME') or None
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD') or None
-    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@tuapp.com')
-    MAIL_TIMEOUT = int(v) if (v := os.getenv('MAIL_TIMEOUT')) else None
-    MAIL_MAX_EMAILS = int(v) if (v := os.getenv('MAIL_MAX_EMAILS')) else None
+    MAIL_ENABLED           = os.getenv('MAIL_ENABLED', 'False').lower() in ['true', '1', 'yes']
+    MAIL_SERVER            = os.getenv('MAIL_SERVER', 'localhost')
+    MAIL_PORT              = int(os.getenv('MAIL_PORT') or 1025)
+    MAIL_USE_TLS           = os.getenv('MAIL_USE_TLS', 'False').lower() == 'true'
+    MAIL_USE_SSL           = os.getenv('MAIL_USE_SSL', 'False').lower() == 'true'
+    MAIL_USERNAME          = os.getenv('MAIL_USERNAME') or None
+    MAIL_PASSWORD          = os.getenv('MAIL_PASSWORD') or None
+    MAIL_DEFAULT_SENDER    = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@tuapp.com')
+    MAIL_TIMEOUT           = int(v) if (v := os.getenv('MAIL_TIMEOUT')) else None
+    MAIL_MAX_EMAILS        = int(v) if (v := os.getenv('MAIL_MAX_EMAILS')) else None
     MAIL_ASCII_ATTACHMENTS = os.getenv('MAIL_ASCII_ATTACHMENTS', 'False').lower() == 'true'
 
     # ===========================================
     # EXTERNAL SERVICES
     # ===========================================
     EXTERNAL_API_URL_BASE = os.getenv('EXTERNAL_API_URL_BASE', '')
-    REQUEST_TIMEOUT = int(os.getenv('REQUEST_TIMEOUT') or 30)
-    FRONTEND_URL_BASE = os.getenv('FRONTEND_URL_BASE', 'http://localhost:3000')
+    REQUEST_TIMEOUT       = int(os.getenv('REQUEST_TIMEOUT') or 30)
+    FRONTEND_URL_BASE     = os.getenv('FRONTEND_URL_BASE', 'http://localhost:3000')
 
-    REDIS_ENABLED = os.getenv('REDIS_ENABLED', 'False').lower() in ['true', '1', 'yes']
-    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = int(os.getenv('REDIS_PORT') or 6379)
+    # ===========================================
+    # REDIS (opcional)
+    # ===========================================
+    # Sin WebSockets: opcional, para caché o rate limiting distribuido
+    # Con WebSockets: obligatorio como message broker de SocketIO
+    REDIS_ENABLED  = os.getenv('REDIS_ENABLED', 'False').lower() in ['true', '1', 'yes']
+    REDIS_HOST     = os.getenv('REDIS_HOST', 'localhost')
+    REDIS_PORT     = int(os.getenv('REDIS_PORT') or 6379)
     REDIS_PASSWORD = os.getenv('REDIS_PASSWORD') or None
-    REDIS_DB = int(os.getenv('REDIS_DB') or 0)
-    
+    REDIS_DB       = int(os.getenv('REDIS_DB') or 0)
+
     @classmethod
     def get_redis_uri(cls):
+        """Retorna URI de Redis para Flask-Limiter y SocketIO. memory:// si está deshabilitado."""
         if not cls.REDIS_ENABLED:
             return "memory://"
         if cls.REDIS_PASSWORD:
@@ -66,7 +74,14 @@ class Config:
             password = quote(cls.REDIS_PASSWORD, safe='')
             return f"redis://:{password}@{cls.REDIS_HOST}:{cls.REDIS_PORT}/{cls.REDIS_DB}"
         return f"redis://{cls.REDIS_HOST}:{cls.REDIS_PORT}/{cls.REDIS_DB}"
-        
+
+    # ===========================================
+    # WEBSOCKETS (opcional)
+    # ===========================================
+    # Requiere REDIS_ENABLED=true como message broker
+    # Ver checklist completo en .env.example
+    WS_ENABLED = os.getenv('WS_ENABLED', 'False').lower() in ['true', '1', 'yes']
+
     # ===========================================
     # LOGGING
     # ===========================================
@@ -75,33 +90,38 @@ class Config:
     # ===========================================
     # CORS
     # ===========================================
-    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000')
-    CORS_METHODS = os.getenv('CORS_METHODS', 'GET')
-    CORS_ALLOW_HEADERS = ['Content-Type', 'Authorization']
+    CORS_ORIGINS             = os.getenv('CORS_ORIGINS', 'http://localhost:3000')
+    CORS_METHODS             = os.getenv('CORS_METHODS', 'GET,POST,PUT,DELETE')
+    CORS_ALLOW_HEADERS       = ['Content-Type', 'Authorization']
     CORS_SUPPORTS_CREDENTIALS = True
-    CORS_MAX_AGE = int(os.getenv('CORS_MAX_AGE') or 3600)
+    CORS_MAX_AGE             = int(os.getenv('CORS_MAX_AGE') or 3600)
 
     # ===========================================
     # RATE LIMITING
     # ===========================================
     RATE_LIMIT_DEFAULT = os.getenv('RATE_LIMIT_DEFAULT', '100 per hour')
-    RATE_LIMIT_LOGIN = os.getenv('RATE_LIMIT_LOGIN', '5 per minute')
+    RATE_LIMIT_LOGIN   = os.getenv('RATE_LIMIT_LOGIN', '5 per minute')
 
     # ===========================================
-    # JWT
+    # JWT (opcional)
     # ===========================================
-    JWT_ENABLED = os.getenv('JWT_ENABLED', 'False').lower() in ['true', '1', 'yes']
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
-    JWT_ACCESS_TOKEN_EXPIRES = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES') or 3600)
+    JWT_ENABLED               = os.getenv('JWT_ENABLED', 'False').lower() in ['true', '1', 'yes']
+    JWT_SECRET_KEY            = os.getenv('JWT_SECRET_KEY')
+    JWT_ACCESS_TOKEN_EXPIRES  = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES') or 3600)
     JWT_REFRESH_TOKEN_EXPIRES = int(os.getenv('JWT_REFRESH_TOKEN_EXPIRES') or 2592000)
 
     # ===========================================
-    # VALIDATION
+    # VALIDACIÓN AL ARRANCAR
     # ===========================================
     @staticmethod
     def validate():
+        """Valida configuración crítica antes de iniciar la app."""
         if Config.FLASK_ENV == 'production':
             if Config.JWT_ENABLED and not Config.JWT_SECRET_KEY:
-                raise ValueError("JWT_SECRET_KEY debe configurarse en producción")
+                raise ValueError("JWT_SECRET_KEY debe configurarse en producción.")
             if Config.CORS_ORIGINS in ['*', 'http://localhost:3000']:
-                raise ValueError("CORS_ORIGINS debe configurarse en producción")
+                raise ValueError("CORS_ORIGINS debe configurarse en producción.")
+            if Config.WS_ENABLED and not Config.REDIS_ENABLED:
+                raise ValueError("REDIS_ENABLED debe ser true cuando WS_ENABLED está activo.")
+            if Config.ADMIN_SECRET_KEY == 'dev-secret-key-change-in-production':
+                raise ValueError("ADMIN_SECRET_KEY debe cambiarse en producción.")

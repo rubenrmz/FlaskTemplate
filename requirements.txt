@@ -15,16 +15,16 @@ Flask-Limiter>=4.0.0,<5
 # ===========================================
 # DATABASE
 # ===========================================
-# Flask-SQLAlchemy>=3.1.1,<4
-# PyMySQL>=1.1.2,<2
-# psycopg2-binary>=2.9.9,<3
+# PyMySQL>=1.1.2,<2          # sin ORM: queries directas
+# psycopg2-binary>=2.9.9,<3  # sin ORM: PostgreSQL directo
+# Flask-SQLAlchemy>=3.1.1,<4 # con ORM: descomentar junto con el driver
 
 # ===========================================
 # VALIDATION
 # ===========================================
 # marshmallow>=3.23.0,<4
-# flask-marshmallow>=1.3.0,<2
-# marshmallow-sqlalchemy>=1.4.2,<2
+# flask-marshmallow>=1.3.0,<2  # solo si usas Flask-SQLAlchemy
+# marshmallow-sqlalchemy>=1.4.2,<2  # con ORM: schemas desde modelos
 
 # ===========================================
 # EMAIL
@@ -32,21 +32,13 @@ Flask-Limiter>=4.0.0,<5
 # Flask-Mailman>=1.1.1,<2
 
 # ===========================================
-# CACHE / RATE LIMITING STORAGE (opcional)
+# CONCURRENCY / WEBSOCKETS
 # ===========================================
-# redis>=5.2.0,<6
+# gevent>=25.9.1,<26                 # workers async para alta concurrencia
+# flask-socketio>=5.5.0,<6           # websockets: requiere gevent descomentado
+# gevent-websocket>=0.10.1,<1        # transporte websocket nativo con gevent
 
 # ===========================================
-# CONCURRENCY (opcional)
-# ===========================================
-# gevent>=25.9.1,<26
-
-# ===========================================
-# ASYNC TASKS (opcional)
-# ===========================================
-# celery>=5.4.0,<6
-
-# ===========================================
-# BROWSER AUTOMATION (opcional)
+# BROWSER AUTOMATION
 # ===========================================
 # playwright>=1.55.0,<2

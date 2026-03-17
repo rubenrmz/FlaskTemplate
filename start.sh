@@ -6,8 +6,6 @@
 #   chmod +x start.sh
 #   ./start.sh
 #
-# O bien: exec gunicorn --config gunicorn.conf.py "app:create_app()"
-#
 # Uso con systemd:
 #   ExecStart=/path/to/project/start.sh
 #
@@ -36,5 +34,16 @@ if [ -f "requirements.txt" ] && [ ! -f "venv/.dependencies_installed" ]; then
     exit 1
 fi
 
-# Ejecutar Gunicorn con factory de producción
-exec gunicorn --config gunicorn.conf.py "app:create_app()"
+# Cargar WS_ENABLED desde .env
+WS_ENABLED=$(grep -E '^WS_ENABLED=' .env | cut -d '=' -f2 | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')
+
+# Arranque según modo
+if [ "$WS_ENABLED" = "true" ]; then
+    # WebSockets: monkey patch debe ir primero via wsgi.py
+    echo "Iniciando con WebSockets (gevent)..."
+    exec gunicorn --config gunicorn.conf.py "wsgi:app"
+else
+    # Sin WebSockets: factory directa
+    echo "Iniciando sin WebSockets (gthread)..."
+    exec gunicorn --config gunicorn.conf.py "src:create_app()"
+fi

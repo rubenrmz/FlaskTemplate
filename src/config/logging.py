@@ -1,29 +1,24 @@
 # src/config/logging.py
-import os, logging
+import logging
+import os
 from src.config.settings import Config
 
 
-def setup_logging(app):
-    """Configura logging para Flask"""
+def setup_logging(app) -> None:
+    """Configura logging para Flask. Archivo en producción, consola en desarrollo."""
     log_level = getattr(logging, Config.LOG_LEVEL.upper(), logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    
+    formatter  = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
     root_logger = logging.getLogger()
     root_logger.setLevel(log_level)
-    
-    # Limpiar handlers existentes (evita duplicados)
     root_logger.handlers.clear()
 
     if Config.FLASK_ENV == 'production':
-        # Crear directorio si no existe
         os.makedirs('logs', exist_ok=True)
-        
-        file_handler = logging.FileHandler('logs/app.log')
-        file_handler.setLevel(log_level)
-        file_handler.setFormatter(formatter)
-        root_logger.addHandler(file_handler)
+        handler = logging.FileHandler('logs/app.log')
     else:
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(log_level)
-        console_handler.setFormatter(formatter)
-        root_logger.addHandler(console_handler)
+        handler = logging.StreamHandler()
+
+    handler.setLevel(log_level)
+    handler.setFormatter(formatter)
+    root_logger.addHandler(handler)
