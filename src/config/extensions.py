@@ -21,6 +21,7 @@ db           = None
 redis_client = None
 ma           = None
 mail         = None
+socketio     = None
 
 # ===========================================
 # DATABASE — elegir modo en settings.py
@@ -141,3 +142,14 @@ try:
     mail = Mail()
 except ImportError:
     pass
+
+# ===========================================
+# WEBSOCKETS (opcional)
+# ===========================================
+# Requiere: gevent, flask-socketio, gevent-websocket en requirements.txt
+# Activar: WS_ENABLED=true en .env
+try:
+    from flask_socketio import SocketIO
+    socketio = SocketIO()
+except ImportError:
+    socketio = None

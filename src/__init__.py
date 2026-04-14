@@ -56,7 +56,7 @@ def create_app(config_class=Config):
             logger=False,
             engineio_logger=False,
         )
-        register_socket_events(socketio)
+        register_socket_events()
         logger.info("WebSockets inicializados")
     
     # Seguridad y logging

@@ -6,7 +6,8 @@ class Config:
     # ===========================================
     # FLASK
     # ===========================================
-    FLASK_ENV         = os.getenv('FLASK_ENV', 'development')
+    FLASK_ENV         = os.getenv('FLASK_ENV', 'production')
+    SECRET_KEY        = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     ADMIN_SECRET_KEY  = os.getenv('ADMIN_SECRET_KEY', 'dev-secret-key-change-in-production')
     MA_ENABLED        = os.getenv('MA_ENABLED', 'False').lower() in ['true', '1', 'yes']
     APP_TIMEZONE = os.getenv('APP_TIMEZONE', 'America/Mexico_City')
