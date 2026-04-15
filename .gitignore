@@ -64,3 +64,5 @@ build/
 # Gunicorn
 *.pid
 *.sock
+
+.claude
