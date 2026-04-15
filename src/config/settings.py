@@ -9,13 +9,16 @@ class Config:
     FLASK_ENV         = os.getenv('FLASK_ENV', 'production')
     SECRET_KEY        = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     ADMIN_SECRET_KEY  = os.getenv('ADMIN_SECRET_KEY', 'dev-secret-key-change-in-production')
-    MA_ENABLED        = os.getenv('MA_ENABLED', 'False').lower() in ['true', '1', 'yes']
-    APP_TIMEZONE = os.getenv('APP_TIMEZONE', 'America/Mexico_City')
+    APP_TIMEZONE      = os.getenv('APP_TIMEZONE', 'America/Mexico_City')
 
     # ===========================================
     # DATABASE (opcional)
     # ===========================================
+    # DB_ENABLED   → activa la conexión a base de datos
+    # ORM_ENABLED  → si true usa SQLAlchemy (Modo B); si false usa PyMySQL directo (Modo A)
+    #                Requiere DB_ENABLED=true.
     DB_ENABLED  = os.getenv('DB_ENABLED', 'False').lower() in ['true', '1', 'yes']
+    ORM_ENABLED = os.getenv('ORM_ENABLED', 'False').lower() in ['true', '1', 'yes']
     DB_TYPE     = os.getenv('DB_TYPE', 'mysql')          # mysql | postgresql
     DB_HOST     = os.getenv('DB_HOST', 'localhost')
     DB_PORT     = os.getenv('DB_PORT', '3306')
@@ -23,8 +26,8 @@ class Config:
     DB_USER     = os.getenv('DB_USER', 'root')
     DB_PASSWORD = os.getenv('DB_PASSWORD', '')
 
-    # URI para SQLAlchemy (Modo B) — ignorado si usas PyMySQL directo (Modo A)
-    if DB_ENABLED:
+    # URI para SQLAlchemy (solo aplica con ORM_ENABLED)
+    if DB_ENABLED and ORM_ENABLED:
         _driver = 'postgresql+psycopg2' if DB_TYPE == 'postgresql' else 'mysql+pymysql'
         SQLALCHEMY_DATABASE_URI = f'{_driver}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DATABASE}'
     else:
@@ -117,6 +120,8 @@ class Config:
     @staticmethod
     def validate():
         """Valida configuración crítica antes de iniciar la app."""
+        if Config.ORM_ENABLED and not Config.DB_ENABLED:
+            raise ValueError("ORM_ENABLED requiere DB_ENABLED=true.")
         if Config.FLASK_ENV == 'production':
             if Config.JWT_ENABLED and not Config.JWT_SECRET_KEY:
                 raise ValueError("JWT_SECRET_KEY debe configurarse en producción.")

@@ -18,18 +18,15 @@ def create_app(config_class=Config):
     limiter.init_app(app)
 
     # Database (opcional)
-    if config_class.DB_ENABLED:
-        from src.config.extensions import db
+    # Modo A (ORM_ENABLED=false): PyMySQL — la conexión se configura al importar extensions.py
+    # Modo B (ORM_ENABLED=true): SQLAlchemy + flask-marshmallow
+    if config_class.DB_ENABLED and config_class.ORM_ENABLED:
+        from src.config.extensions import db, ma
         if db is None:
-            raise ImportError("Flask-SQLAlchemy no está instalado. Instálalo o desactiva DB_ENABLED.")
+            raise ImportError("Flask-SQLAlchemy no está instalado. Instálalo o desactiva ORM_ENABLED.")
         db.init_app(app)
-
-    # Marshmallow (opcional)
-    if config_class.MA_ENABLED:
-        from src.config.extensions import ma
-        if ma is None:
-            raise ImportError("Flask-Marshmallow no está instalado. Instálalo o desactiva MA_ENABLED.")
-        ma.init_app(app)
+        if ma is not None:
+            ma.init_app(app)
 
     # Mail (opcional)
     if config_class.MAIL_ENABLED:

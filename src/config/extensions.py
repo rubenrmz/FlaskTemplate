@@ -24,20 +24,19 @@ mail         = None
 socketio     = None
 
 # ===========================================
-# DATABASE — elegir modo en settings.py
+# DATABASE — modo se elige con ORM_ENABLED en .env
 # ===========================================
-# Modo A: PyMySQL directo (sin ORM)
-# - Ideal para queries simples y arquitectura repo/*_queries.py
-# - Menor overhead, control total del SQL
-# - Usar: get_db() como context manager en los queries
+# Modo A (ORM_ENABLED=false): PyMySQL directo
+# - Queries simples + arquitectura repo/*_queries.py
+# - Expone: get_connection(), get_db() context manager, check_db_connection()
 #
-# Modo B: SQLAlchemy (con ORM)
-# - Ideal para modelos complejos con relaciones y migraciones
-# - Descomentar bloque SQLAlchemy y comentar bloque PyMySQL
-# - Requiere: Flask-SQLAlchemy en requirements.txt
+# Modo B (ORM_ENABLED=true): SQLAlchemy
+# - Modelos complejos con relaciones y migraciones
+# - Expone: db (SQLAlchemy()), Base (DeclarativeBase)
+# - Activa además flask-marshmallow + marshmallow-sqlalchemy
 
-# --- Modo A: PyMySQL directo ---
-if Config.DB_ENABLED:
+if Config.DB_ENABLED and not Config.ORM_ENABLED:
+    # --- Modo A: PyMySQL directo ---
     try:
         import pymysql
         from contextlib import contextmanager
@@ -77,20 +76,24 @@ if Config.DB_ENABLED:
     except ImportError:
         logger.error("PyMySQL no está instalado. Instálalo o desactiva DB_ENABLED.")
 
-# --- Modo B: SQLAlchemy (ORM) ---
-# Descomentar este bloque y comentar Modo A para usar ORM
-# Requiere: Flask-SQLAlchemy, y driver mysql o postgresql en requirements.txt
-#
-# try:
-#     from flask_sqlalchemy import SQLAlchemy
-#     from sqlalchemy.orm import DeclarativeBase
-#
-#     class Base(DeclarativeBase):
-#         pass
-#
-#     db = SQLAlchemy(model_class=Base)
-# except ImportError:
-#     logger.error("Flask-SQLAlchemy no está instalado. Instálalo o desactiva DB_ENABLED.")
+elif Config.DB_ENABLED and Config.ORM_ENABLED:
+    # --- Modo B: SQLAlchemy + flask-marshmallow ---
+    try:
+        from flask_sqlalchemy import SQLAlchemy
+        from sqlalchemy.orm import DeclarativeBase
+
+        class Base(DeclarativeBase):
+            pass
+
+        db = SQLAlchemy(model_class=Base)
+    except ImportError:
+        logger.error("Flask-SQLAlchemy no está instalado. Instálalo o desactiva ORM_ENABLED.")
+
+    try:
+        from flask_marshmallow import Marshmallow
+        ma = Marshmallow()
+    except ImportError:
+        logger.error("Flask-Marshmallow no está instalado. Instálalo o desactiva ORM_ENABLED.")
 
 # ===========================================
 # REDIS (opcional)
@@ -122,16 +125,6 @@ def init_redis():
         logger.error(f"Redis error: {type(e).__name__}: {e}")
         redis_client = None
     return redis_client
-
-
-# ===========================================
-# MARSHMALLOW (opcional)
-# ===========================================
-try:
-    from flask_marshmallow import Marshmallow
-    ma = Marshmallow()
-except ImportError:
-    pass
 
 
 # ===========================================

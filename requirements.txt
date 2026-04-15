@@ -15,16 +15,26 @@ Flask-Limiter>=4.0.0,<5
 # ===========================================
 # DATABASE
 # ===========================================
-# PyMySQL>=1.1.2,<2          # sin ORM: queries directas
-# psycopg2-binary>=2.9.9,<3  # sin ORM: PostgreSQL directo
-# Flask-SQLAlchemy>=3.1.1,<4 # con ORM: descomentar junto con el driver
+# Modo A — DB_ENABLED=true, ORM_ENABLED=false (PyMySQL directo)
+#   Descomentar el driver de tu motor:
+# PyMySQL>=1.1.2,<2
+# psycopg2-binary>=2.9.9,<3
+
+# Modo B — DB_ENABLED=true, ORM_ENABLED=true (SQLAlchemy)
+#   Descomentar Flask-SQLAlchemy + driver:
+# Flask-SQLAlchemy>=3.1.1,<4
+# PyMySQL>=1.1.2,<2          # driver mysql
+# psycopg2-binary>=2.9.9,<3  # driver postgresql
 
 # ===========================================
 # VALIDATION
 # ===========================================
+# Modo A — marshmallow puro
 # marshmallow>=3.23.0,<4
-# flask-marshmallow>=1.3.0,<2  # solo si usas Flask-SQLAlchemy
-# marshmallow-sqlalchemy>=1.4.2,<2  # con ORM: schemas desde modelos
+
+# Modo B — flask-marshmallow + bindings ORM
+# Flask-Marshmallow>=1.3.0,<2
+# marshmallow-sqlalchemy>=1.4.2,<2
 
 # ===========================================
 # EMAIL
