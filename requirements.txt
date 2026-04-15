@@ -36,7 +36,7 @@ Flask-Limiter>=4.0.0,<5
 # ===========================================
 # gevent>=25.9.1,<26                 # workers async para alta concurrencia
 # flask-socketio>=5.5.0,<6           # websockets: requiere gevent descomentado
-# gevent-websocket>=0.10.1,<1        # transporte websocket nativo con gevent
+# simple-websocket>=1.0,<2           # transporte websocket recomendado por flask-socketio
 
 # ===========================================
 # BROWSER AUTOMATION

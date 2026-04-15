@@ -146,7 +146,7 @@ except ImportError:
 # ===========================================
 # WEBSOCKETS (opcional)
 # ===========================================
-# Requiere: gevent, flask-socketio, gevent-websocket en requirements.txt
+# Requiere: gevent, flask-socketio, simple-websocket en requirements.txt
 # Activar: WS_ENABLED=true en .env
 try:
     from flask_socketio import SocketIO
