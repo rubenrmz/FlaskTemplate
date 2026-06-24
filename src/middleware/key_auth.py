@@ -1,4 +1,5 @@
 # src/middleware/key_auth.py
+import hmac
 import logging
 from functools import wraps
 from flask import request, jsonify
@@ -17,7 +18,8 @@ def require_admin_key(f):
             logger.warning(f"Acceso admin sin key desde {request.remote_addr}")
             return jsonify({"success": False, "error": "No autorizado"}), 401
 
-        if api_key != Config.ADMIN_SECRET_KEY:
+        # Comparación en tiempo constante para evitar timing attacks.
+        if not hmac.compare_digest(api_key, Config.ADMIN_SECRET_KEY):
             logger.warning(f"Acceso admin con key inválida desde {request.remote_addr}")
             return jsonify({"success": False, "error": "No autorizado"}), 401
 

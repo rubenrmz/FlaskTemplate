@@ -27,6 +27,15 @@ fi
 # Activar venv
 source venv/bin/activate
 
+# Exigir Python 3.14.x (alineado con .python-version)
+REQUIRED_MAJOR_MINOR="3.14"
+ACTUAL=$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+if [ "$ACTUAL" != "$REQUIRED_MAJOR_MINOR" ]; then
+    echo "Error: Se requiere Python $REQUIRED_MAJOR_MINOR.x, pero el venv usa $ACTUAL"
+    echo "Recrear venv con: pyenv install 3.14.6 && pyenv local 3.14.6 && python -m venv venv"
+    exit 1
+fi
+
 # Verificar instalación de dependencias
 if [ -f "requirements.txt" ] && [ ! -f "venv/.dependencies_installed" ]; then
     echo "Error: Requiere instalar dependencias"

@@ -64,11 +64,15 @@ if Config.DB_ENABLED and not Config.ORM_ENABLED:
 
 
         def check_db_connection():
-            """Valida que la base de datos sea accesible al arrancar."""
+            """Valida que la base de datos sea accesible y retorna su versión."""
             try:
                 with get_db() as conn:
-                    conn.cursor().execute("SELECT 1")
+                    cur = conn.cursor()
+                    cur.execute("SELECT VERSION()")
+                    row = cur.fetchone()
+                version = next(iter(row.values())) if row else None
                 logger.info("Base de datos conectada OK")
+                return version
             except Exception as e:
                 logger.error(f"Error al conectar DB: {type(e).__name__}: {e}")
                 raise RuntimeError("Base de datos no disponible.") from e

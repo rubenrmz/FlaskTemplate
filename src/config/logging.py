@@ -1,6 +1,7 @@
 # src/config/logging.py
 import logging
 import os
+from logging.handlers import RotatingFileHandler
 from src.config.settings import Config
 
 
@@ -15,7 +16,10 @@ def setup_logging(app) -> None:
 
     if Config.FLASK_ENV == 'production':
         os.makedirs('logs', exist_ok=True)
-        handler = logging.FileHandler('logs/app.log')
+        # Rotación para evitar que el log llene el disco: 10MB x 5 archivos.
+        handler = RotatingFileHandler(
+            'logs/app.log', maxBytes=10 * 1024 * 1024, backupCount=5
+        )
     else:
         handler = logging.StreamHandler()
 

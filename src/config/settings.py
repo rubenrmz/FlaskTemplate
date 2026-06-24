@@ -1,5 +1,9 @@
 # src/config/settings.py
 import os
+import sys
+
+# Versión mínima de Python exigida por el template (alineada con .python-version)
+REQUIRED_PYTHON = (3, 14)
 
 
 class Config:
@@ -10,6 +14,27 @@ class Config:
     SECRET_KEY        = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     ADMIN_SECRET_KEY  = os.getenv('ADMIN_SECRET_KEY', 'dev-secret-key-change-in-production')
     APP_TIMEZONE      = os.getenv('APP_TIMEZONE', 'America/Mexico_City')
+
+    # Bandera global de entorno de desarrollo.
+    # Úsala en rutas y recursos para alternar entre dev y prod.
+    IS_DEV     = os.getenv('IS_DEV', 'False').lower() in ['true', '1', 'yes']
+    API_PREFIX = os.getenv('API_PREFIX', '/api/v1')
+
+    # ===========================================
+    # SEGURIDAD HTTP
+    # ===========================================
+    # Tamaño máximo del body de un request (anti-DoS). En MB.
+    MAX_CONTENT_LENGTH = int(os.getenv('MAX_CONTENT_LENGTH_MB') or 16) * 1024 * 1024
+
+    # Cookies de sesión endurecidas. Secure solo en producción (requiere HTTPS).
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax')
+    SESSION_COOKIE_SECURE   = os.getenv('FLASK_ENV', 'production') == 'production'
+
+    # Número de proxies de confianza al frente (nginx/openresty).
+    # 0 = sin proxy (no se aplica ProxyFix; evita spoofing de X-Forwarded-For).
+    # Detrás de un solo nginx: 1.
+    TRUSTED_PROXY_COUNT = int(os.getenv('TRUSTED_PROXY_COUNT') or 0)
 
     # ===========================================
     # DATABASE (opcional)
@@ -120,6 +145,11 @@ class Config:
     @staticmethod
     def validate():
         """Valida configuración crítica antes de iniciar la app."""
+        if sys.version_info[:2] < REQUIRED_PYTHON:
+            raise RuntimeError(
+                f"Se requiere Python {REQUIRED_PYTHON[0]}.{REQUIRED_PYTHON[1]}+, "
+                f"detectado {sys.version_info.major}.{sys.version_info.minor}."
+            )
         if Config.ORM_ENABLED and not Config.DB_ENABLED:
             raise ValueError("ORM_ENABLED requiere DB_ENABLED=true.")
         if Config.FLASK_ENV == 'production':
@@ -131,3 +161,5 @@ class Config:
                 raise ValueError("REDIS_ENABLED debe ser true cuando WS_ENABLED está activo.")
             if Config.ADMIN_SECRET_KEY == 'dev-secret-key-change-in-production':
                 raise ValueError("ADMIN_SECRET_KEY debe cambiarse en producción.")
+            if Config.SECRET_KEY == 'dev-secret-key-change-in-production':
+                raise ValueError("SECRET_KEY debe cambiarse en producción.")

@@ -1,7 +1,6 @@
 # src/api/healthcheck_routes.py
 import time, logging
 from flask import Blueprint, jsonify
-from src.config.extensions import check_db_connection
 from src.middleware.key_auth import require_admin_key
 from src.utils.time_util import now_iso
 
@@ -25,6 +24,18 @@ def health_check():
 @require_admin_key
 def database_health():
     """Verifica conectividad y tiempo de respuesta de la base de datos."""
+    # Import lazy: check_db_connection solo existe en Modo A (PyMySQL directo).
+    # Si DB está desactivada o en modo ORM, el endpoint responde 503 sin romper la app.
+    try:
+        from src.config.extensions import check_db_connection
+    except ImportError:
+        return jsonify({
+            'success': False,
+            'status':  'unavailable',
+            'service': 'DB Healthcheck',
+            'error':   'Healthcheck de DB no disponible en esta configuración.',
+        }), 503
+
     try:
         start        = time.perf_counter()
         version      = check_db_connection()
