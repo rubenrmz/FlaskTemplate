@@ -132,10 +132,21 @@ class Config:
     RATE_LIMIT_LOGIN   = os.getenv('RATE_LIMIT_LOGIN', '5 per minute')
 
     # ===========================================
-    # JWT (opcional)
+    # AUTH (selector global)
     # ===========================================
-    JWT_ENABLED               = os.getenv('JWT_ENABLED', 'False').lower() in ['true', '1', 'yes']
-    JWT_SECRET_KEY            = os.getenv('JWT_SECRET_KEY')
+    # AUTH_REQUIRED: si la API exige autenticación. false = endpoints abiertos
+    #   (el decorador @require_auth se vuelve no-op).
+    # AUTH_MODE: estrategia activa cuando AUTH_REQUIRED=true:
+    #   - gateway: identidad inyectada por nginx/openresty (edge auth)
+    #   - jwt:     login + Bearer token validados dentro de la app
+    AUTH_REQUIRED = os.getenv('AUTH_REQUIRED', 'False').lower() in ['true', '1', 'yes']
+    AUTH_MODE     = os.getenv('AUTH_MODE', 'gateway').lower()
+    AUTH_MODES    = ('gateway', 'jwt')
+
+    # ===========================================
+    # JWT (usado cuando AUTH_MODE=jwt)
+    # ===========================================
+    JWT_SECRET_KEY            = os.getenv('JWT_SECRET_KEY') or None
     JWT_ACCESS_TOKEN_EXPIRES  = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES') or 3600)
     JWT_REFRESH_TOKEN_EXPIRES = int(os.getenv('JWT_REFRESH_TOKEN_EXPIRES') or 2592000)
 
@@ -149,7 +160,6 @@ class Config:
     #   1. gunicorn bindea 127.0.0.1 (la app nunca es pública directa).
     #   2. nginx debe SOBRESCRIBIR los headers de identidad del cliente (no pasarlos).
     #   3. Secreto compartido: la app ignora la identidad si GATEWAY_SECRET_HEADER no cuadra.
-    GATEWAY_AUTH_ENABLED   = os.getenv('GATEWAY_AUTH_ENABLED', 'False').lower() in ['true', '1', 'yes']
     GATEWAY_SHARED_SECRET  = os.getenv('GATEWAY_SHARED_SECRET') or None
     GATEWAY_SECRET_HEADER  = os.getenv('GATEWAY_SECRET_HEADER', 'X-Gateway-Secret')
     GATEWAY_HEADER_USER_ID = os.getenv('GATEWAY_HEADER_USER_ID', 'X-User-Id')
@@ -169,11 +179,14 @@ class Config:
             )
         if Config.ORM_ENABLED and not Config.DB_ENABLED:
             raise ValueError("ORM_ENABLED requiere DB_ENABLED=true.")
-        if Config.GATEWAY_AUTH_ENABLED and not Config.GATEWAY_SHARED_SECRET:
-            raise ValueError("GATEWAY_SHARED_SECRET debe configurarse cuando GATEWAY_AUTH_ENABLED=true.")
+        if Config.AUTH_REQUIRED:
+            if Config.AUTH_MODE not in Config.AUTH_MODES:
+                raise ValueError(f"AUTH_MODE inválido: '{Config.AUTH_MODE}'. Opciones: {Config.AUTH_MODES}.")
+            if Config.AUTH_MODE == 'gateway' and not Config.GATEWAY_SHARED_SECRET:
+                raise ValueError("GATEWAY_SHARED_SECRET es obligatorio con AUTH_MODE=gateway.")
+            if Config.AUTH_MODE == 'jwt' and not (Config.JWT_SECRET_KEY or Config.SECRET_KEY):
+                raise ValueError("JWT_SECRET_KEY (o SECRET_KEY) es obligatorio con AUTH_MODE=jwt.")
         if Config.FLASK_ENV == 'production':
-            if Config.JWT_ENABLED and not Config.JWT_SECRET_KEY:
-                raise ValueError("JWT_SECRET_KEY debe configurarse en producción.")
             if Config.CORS_ORIGINS in ['*', 'http://localhost:3000']:
                 raise ValueError("CORS_ORIGINS debe configurarse en producción.")
             if Config.WS_ENABLED and not Config.REDIS_ENABLED:

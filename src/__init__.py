@@ -73,6 +73,12 @@ def create_app():
     # Blueprints
     app.register_blueprint(api_bp, url_prefix=Config.API_PREFIX)
 
+    # Endpoints de login JWT: solo cuando la estrategia activa es jwt.
+    if Config.AUTH_REQUIRED and Config.AUTH_MODE == 'jwt':
+        from src.api.auth_routes import auth_bp
+        app.register_blueprint(auth_bp, url_prefix=Config.API_PREFIX)
+        logger.info("Auth JWT habilitada (login/refresh)")
+
     logger.info(f"App iniciada en modo {Config.FLASK_ENV}")
     return app
 
