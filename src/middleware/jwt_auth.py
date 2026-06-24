@@ -37,12 +37,12 @@ def _now():
 def create_access_token(identity, roles=None, email=None):
     """Genera un access token de corta duración."""
     payload = {
-        "sub":   str(identity),
-        "roles": roles or [],
-        "email": email,
-        "type":  "access",
-        "iat":   _now(),
-        "exp":   _now() + timedelta(seconds=Config.JWT_ACCESS_TOKEN_EXPIRES),
+        "sub":                   str(identity),
+        Config.JWT_ROLES_CLAIM:  roles or [],
+        "email":                 email,
+        "type":                  "access",
+        "iat":                   _now(),
+        "exp":                   _now() + timedelta(seconds=Config.JWT_ACCESS_TOKEN_EXPIRES),
     }
     return pyjwt.encode(payload, _secret(), algorithm=ALGORITHM)
 
@@ -90,7 +90,7 @@ def authenticate():
 
     g.current_user = {
         "id":    data.get("sub"),
-        "roles": data.get("roles", []),
+        "roles": data.get(Config.JWT_ROLES_CLAIM, []),
         "email": data.get("email"),
     }
     return None

@@ -23,14 +23,15 @@ import logging
 from functools import wraps
 from flask import g, jsonify
 from src.config.settings import Config
-from src.middleware import gateway_auth, jwt_auth
+from src.middleware import gateway_auth, jwt_auth, pubkey_auth
 
 logger = logging.getLogger(__name__)
 
 # Estrategia → función authenticate() que valida y carga g.current_user.
 _AUTHENTICATORS = {
-    "gateway": gateway_auth.authenticate,
-    "jwt":     jwt_auth.authenticate,
+    "gateway":    gateway_auth.authenticate,
+    "jwt":        jwt_auth.authenticate,
+    "jwt_pubkey": pubkey_auth.authenticate,
 }
 
 

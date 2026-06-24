@@ -10,6 +10,8 @@ gunicorn>=23.0.0,<24
 # ===========================================
 flask-cors>=6.0.1,<7
 Flask-Limiter>=4.0.0,<5
+# AUTH_MODE=jwt (HS256):        PyJWT>=2.9.0,<3
+# AUTH_MODE=jwt_pubkey (RS/ES): PyJWT[crypto]>=2.9.0,<3   # incluye cryptography
 # PyJWT>=2.9.0,<3
 
 # ===========================================

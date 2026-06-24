@@ -137,18 +137,34 @@ class Config:
     # AUTH_REQUIRED: si la API exige autenticación. false = endpoints abiertos
     #   (el decorador @require_auth se vuelve no-op).
     # AUTH_MODE: estrategia activa cuando AUTH_REQUIRED=true:
-    #   - gateway: identidad inyectada por nginx/openresty (edge auth)
-    #   - jwt:     login + Bearer token validados dentro de la app
+    #   - gateway:    identidad inyectada por nginx/openresty (edge auth)
+    #   - jwt:        login + Bearer token simétrico (HS256) emitido por la app
+    #   - jwt_pubkey: Bearer token asimétrico (RS256/ES256/EdDSA) emitido por un
+    #                 servicio centralizado; la app solo VERIFICA con la llave pública
     AUTH_REQUIRED = os.getenv('AUTH_REQUIRED', 'False').lower() in ['true', '1', 'yes']
     AUTH_MODE     = os.getenv('AUTH_MODE', 'gateway').lower()
-    AUTH_MODES    = ('gateway', 'jwt')
+    AUTH_MODES    = ('gateway', 'jwt', 'jwt_pubkey')
+
+    # Nombre del claim que contiene los roles (interop con emisores externos).
+    JWT_ROLES_CLAIM = os.getenv('JWT_ROLES_CLAIM', 'roles')
 
     # ===========================================
-    # JWT (usado cuando AUTH_MODE=jwt)
+    # JWT SIMÉTRICO (usado cuando AUTH_MODE=jwt)
     # ===========================================
     JWT_SECRET_KEY            = os.getenv('JWT_SECRET_KEY') or None
     JWT_ACCESS_TOKEN_EXPIRES  = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES') or 3600)
     JWT_REFRESH_TOKEN_EXPIRES = int(os.getenv('JWT_REFRESH_TOKEN_EXPIRES') or 2592000)
+
+    # ===========================================
+    # JWT ASIMÉTRICO (usado cuando AUTH_MODE=jwt_pubkey)
+    # ===========================================
+    # La app solo verifica con la llave pública; el login vive en el servicio
+    # centralizado (rust-axum). Requiere PyJWT[crypto] (trae cryptography).
+    JWT_PUBLIC_KEY      = os.getenv('JWT_PUBLIC_KEY') or None        # PEM inline (\n escapados)
+    JWT_PUBLIC_KEY_PATH = os.getenv('JWT_PUBLIC_KEY_PATH') or None   # o ruta a un .pem
+    JWT_ALGORITHM       = os.getenv('JWT_ALGORITHM', 'RS256')        # RS256 | ES256 | EdDSA | PS256...
+    JWT_ISSUER          = os.getenv('JWT_ISSUER') or None            # valida 'iss' si se define
+    JWT_AUDIENCE        = os.getenv('JWT_AUDIENCE') or None          # valida 'aud' si se define
 
     # ===========================================
     # GATEWAY AUTH (opcional)
@@ -186,6 +202,8 @@ class Config:
                 raise ValueError("GATEWAY_SHARED_SECRET es obligatorio con AUTH_MODE=gateway.")
             if Config.AUTH_MODE == 'jwt' and not (Config.JWT_SECRET_KEY or Config.SECRET_KEY):
                 raise ValueError("JWT_SECRET_KEY (o SECRET_KEY) es obligatorio con AUTH_MODE=jwt.")
+            if Config.AUTH_MODE == 'jwt_pubkey' and not (Config.JWT_PUBLIC_KEY or Config.JWT_PUBLIC_KEY_PATH):
+                raise ValueError("JWT_PUBLIC_KEY o JWT_PUBLIC_KEY_PATH es obligatorio con AUTH_MODE=jwt_pubkey.")
         if Config.FLASK_ENV == 'production':
             if Config.CORS_ORIGINS in ['*', 'http://localhost:3000']:
                 raise ValueError("CORS_ORIGINS debe configurarse en producción.")
