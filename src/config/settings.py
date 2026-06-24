@@ -140,6 +140,23 @@ class Config:
     JWT_REFRESH_TOKEN_EXPIRES = int(os.getenv('JWT_REFRESH_TOKEN_EXPIRES') or 2592000)
 
     # ===========================================
+    # GATEWAY AUTH (opcional)
+    # ===========================================
+    # Auth en el edge: nginx/openresty valida el JWT con Lua e inyecta la identidad
+    # como headers. La app NO revalida el JWT, solo consume la identidad ya verificada.
+    #
+    # SEGURIDAD (3 capas, ver .env.example para el bloque de OpenResty):
+    #   1. gunicorn bindea 127.0.0.1 (la app nunca es pública directa).
+    #   2. nginx debe SOBRESCRIBIR los headers de identidad del cliente (no pasarlos).
+    #   3. Secreto compartido: la app ignora la identidad si GATEWAY_SECRET_HEADER no cuadra.
+    GATEWAY_AUTH_ENABLED   = os.getenv('GATEWAY_AUTH_ENABLED', 'False').lower() in ['true', '1', 'yes']
+    GATEWAY_SHARED_SECRET  = os.getenv('GATEWAY_SHARED_SECRET') or None
+    GATEWAY_SECRET_HEADER  = os.getenv('GATEWAY_SECRET_HEADER', 'X-Gateway-Secret')
+    GATEWAY_HEADER_USER_ID = os.getenv('GATEWAY_HEADER_USER_ID', 'X-User-Id')
+    GATEWAY_HEADER_ROLES   = os.getenv('GATEWAY_HEADER_ROLES', 'X-User-Roles')
+    GATEWAY_HEADER_EMAIL   = os.getenv('GATEWAY_HEADER_EMAIL', 'X-User-Email')
+
+    # ===========================================
     # VALIDACIÓN AL ARRANCAR
     # ===========================================
     @staticmethod
@@ -152,6 +169,8 @@ class Config:
             )
         if Config.ORM_ENABLED and not Config.DB_ENABLED:
             raise ValueError("ORM_ENABLED requiere DB_ENABLED=true.")
+        if Config.GATEWAY_AUTH_ENABLED and not Config.GATEWAY_SHARED_SECRET:
+            raise ValueError("GATEWAY_SHARED_SECRET debe configurarse cuando GATEWAY_AUTH_ENABLED=true.")
         if Config.FLASK_ENV == 'production':
             if Config.JWT_ENABLED and not Config.JWT_SECRET_KEY:
                 raise ValueError("JWT_SECRET_KEY debe configurarse en producción.")
